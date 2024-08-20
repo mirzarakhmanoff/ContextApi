@@ -1,3 +1,5 @@
+// src/context/reducer.jsx
+
 export const initialState = {
   a: 5,
   wishList: [],
@@ -28,12 +30,36 @@ export const reducer = (state, action) => {
       const cartIdx = state.cart.findIndex(
         (item) => item.id === action.payload.id
       );
-
       if (cartIdx < 0) {
-        return { ...state, cart: [...state.cart, action.payload] };
+        return {
+          ...state,
+          cart: [...state.cart, { ...action.payload, quantity: 1 }],
+        };
       } else {
         return state;
       }
+
+    case "UPDATE_CART":
+      return {
+        ...state,
+        cart: state.cart.map((item) =>
+          item.id === action.payload.id
+            ? {
+                ...item,
+                quantity: Math.max(
+                  (item.quantity || 1) + action.payload.quantity,
+                  1
+                ),
+              }
+            : item
+        ),
+      };
+
+    case "REMOVE_CART_ITEM":
+      return {
+        ...state,
+        cart: state.cart.filter((item) => item.id !== action.payload.id),
+      };
 
     default:
       return state;
